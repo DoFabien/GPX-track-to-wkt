@@ -25,10 +25,22 @@ $array_pre_wkt = array(); // tableau vide qu'on va remplir avec : lng , lat  (fo
 $distance = 0;
 $d_plus = 0;
 $d_moins = 0;
+$z_min = null;
+$z_max = null;
 
 
 for ($i = 0; $i< count($coords_gpx); $i++){ 
     $pt = $coords_gpx[$i];
+    $alt = (float) $pt->ele;
+
+    if ($z_max < $alt || is_null($z_max)){
+        $z_max = $alt;
+    }
+
+    if ($z_min > $alt || is_null($z_min)){
+        $z_min = $alt;
+    }
+
     if ($i > 0){
         $pt_prec = $coords_gpx[$i - 1];
         $lat1 = (float) $pt_prec['lat'];
@@ -60,7 +72,14 @@ for ($i = 0; $i< count($coords_gpx); $i++){
 $denivele = ((float)$coords_gpx[count($coords_gpx)-1]->ele ) -  ((float)$coords_gpx[0]->ele );
 $wkt_str = 'LINESTRING(' . implode(',',$array_pre_wkt) . ')'; //// le WKT à pousser dans la base
 
-$obj = (object) array('wkt' => $wkt_str, 'distance' => $distance, 'd_plus' => $d_plus, 'd_moins' => $d_moins, 'denivele'=>$denivele );
+$obj = (object) array('wkt' => $wkt_str, 
+                     'distance' => $distance, 
+                     'd_plus' => $d_plus, 
+                     'd_moins' => $d_moins, 
+                     'denivele'=>$denivele,
+                     'z_min' => $z_min,
+                     'z_max' => $z_max,
+                    );
  return $obj;
 }
 
